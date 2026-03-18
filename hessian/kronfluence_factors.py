@@ -71,6 +71,8 @@ def parse_args():
     parser.add_argument("--use_empirical_fisher", action="store_true", default=False)
     parser.add_argument("--include_bias", action="store_true", default=False)
 
+    parser.add_argument("--output_dir", type=str, default="./hessian/results")
+    parser.add_argument("--analysis_name", type=str, default="kronfluence")
     parser.add_argument("--profile", action="store_true", default=False)
     parser.add_argument("--overwrite", action="store_true", default=False)
 
@@ -118,9 +120,10 @@ def main():
 
     # ── Analyzer ─────────────────────────────────────────────────────────────
     analyzer = Analyzer(
-        analysis_name="bergson_compare",
+        analysis_name=args.analysis_name,
         model=model,
         task=task,
+        output_dir=args.output_dir,
         profile=args.profile,
     )
     tokenizer = AutoTokenizer.from_pretrained(args.model, use_fast=True, trust_remote_code=True)
@@ -155,7 +158,10 @@ def main():
         factor_args=factor_args,
         overwrite_output_dir=args.overwrite,
     )
-    logging.info("Done. Factors saved under analysis_name='bergson_compare', factors_name='%s'", args.factors_name)
+    logging.info(
+        "Done. Factors saved to %s/%s/factors_%s",
+        args.output_dir, args.analysis_name, args.factors_name,
+    )
 
 
 if __name__ == "__main__":

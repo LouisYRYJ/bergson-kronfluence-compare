@@ -6,6 +6,7 @@ MODEL="EleutherAI/pythia-14m-deduped"
 QUERY_DATASET="NeelNanda/pile-10k"
 TRAIN_DATASET="NeelNanda/pile-10k"
 SCORES_NAME="identity_scores"
+OUTPUT_DIR="raw_influence/results"
 
 # ── Data ─────────────────────────────────────────────────────────────────────
 QUERY_SPLIT="train"
@@ -27,10 +28,12 @@ CMD+=" --train_split ${TRAIN_SPLIT}"
 CMD+=" --text_column ${TEXT_COLUMN}"
 CMD+=" --max_length ${MAX_LENGTH}"
 CMD+=" --scores_name ${SCORES_NAME}"
+CMD+=" --output_dir ${OUTPUT_DIR}"
 CMD+=" --overwrite"
 
 [[ "${QUERY_SIZE}" -gt 0 ]] && CMD+=" --query_size ${QUERY_SIZE}"
 [[ "${TRAIN_SIZE}" -gt 0 ]] && CMD+=" --train_size ${TRAIN_SIZE}"
 
+mkdir -p raw_influence/results
 echo "Running: ${CMD}"
-eval "${CMD}"
+eval "${CMD}" 2>&1 | tee raw_influence/results/kronfluence.log

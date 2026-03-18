@@ -13,7 +13,9 @@ MAX_LENGTH=2048
 
 # ── Factor strategy ──────────────────────────────────────────────────────────
 FACTOR_STRATEGY="ekfac"
-FACTORS_NAME="bergson_compare"
+FACTORS_NAME="ekfac"
+ANALYSIS_NAME="kronfluence"
+OUTPUT_DIR="./hessian/results"
 FACTOR_BATCH_SIZE=2
 TORCH_DTYPE="float32"
 
@@ -26,7 +28,7 @@ COVARIANCE_DATA_PARTITIONS=1
 LAMBDA_MODULE_PARTITIONS=1
 LAMBDA_DATA_PARTITIONS=1
 
-ENV_PREFIX="CUDA_VISIBLE_DEVICES=0"
+ENV_PREFIX="CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}"
 
 # ── Build & run command ──────────────────────────────────────────────────────
 CMD="python -m hessian.kronfluence_factors"
@@ -44,10 +46,13 @@ CMD+=" --covariance_module_partitions ${COVARIANCE_MODULE_PARTITIONS}"
 CMD+=" --covariance_data_partitions ${COVARIANCE_DATA_PARTITIONS}"
 CMD+=" --lambda_module_partitions ${LAMBDA_MODULE_PARTITIONS}"
 CMD+=" --lambda_data_partitions ${LAMBDA_DATA_PARTITIONS}"
+CMD+=" --output_dir ${OUTPUT_DIR}"
+CMD+=" --analysis_name ${ANALYSIS_NAME}"
 CMD+=" --use_empirical_fisher"
 CMD+=" --overwrite"
 
 [[ -n "${TRACKED_MODULES}" ]] && CMD+=" --tracked_modules \"${TRACKED_MODULES}\""
 
+mkdir -p hessian/results
 echo "Running: ${ENV_PREFIX} ${CMD}"
-eval "${ENV_PREFIX} ${CMD}"
+eval "${ENV_PREFIX} ${CMD}" 2>&1 | tee hessian/results/kronfluence.log

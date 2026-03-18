@@ -73,8 +73,12 @@ def parse_args():
 
     # ── Output ────────────────────────────────────────────────────────────────
     parser.add_argument(
-        "--output_dir", type=str, default="./hessian_simple/results/kronfluence",
+        "--output_dir", type=str, default="./hessian_simple/results",
         help="Directory for storing analysis results.",
+    )
+    parser.add_argument(
+        "--analysis_name", type=str, default="kronfluence",
+        help="Analysis name (subdirectory under output_dir).",
     )
 
     parser.add_argument("--profile", action="store_true", default=False)
@@ -128,7 +132,7 @@ def main():
 
     # ── Analyzer ─────────────────────────────────────────────────────────────
     analyzer = Analyzer(
-        analysis_name=args.factors_name,
+        analysis_name=args.analysis_name,
         model=model,
         task=task,
         profile=args.profile,
@@ -155,8 +159,8 @@ def main():
         overwrite_output_dir=args.overwrite,
     )
     logging.info(
-        "Done. Factors saved to %s/%s/%s",
-        args.output_dir, args.factors_name, args.factors_name,
+        "Done. Factors saved to %s/%s/factors_%s",
+        args.output_dir, args.analysis_name, args.factors_name,
     )
 
 

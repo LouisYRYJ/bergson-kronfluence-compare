@@ -26,7 +26,7 @@ LOSS_REDUCTION="sum"
 FSDP=""
 FILTER_MODULES=""
 
-ENV_PREFIX="CUDA_VISIBLE_DEVICES=0"
+ENV_PREFIX="CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}"
 
 # ── Build & run command ──────────────────────────────────────────────────────
 CMD="python -m common.bergson_hessian ${RUN_PATH}"
@@ -50,5 +50,6 @@ CMD+=" --overwrite"
 [[ -n "${FSDP}" ]]                  && CMD+=" ${FSDP}"
 [[ -n "${USE_DATASET_LABELS}" ]]    && CMD+=" ${USE_DATASET_LABELS}"
 
+mkdir -p hessian_simple/results
 echo "Running: ${ENV_PREFIX} ${CMD}"
-eval "${ENV_PREFIX} ${CMD}"
+eval "${ENV_PREFIX} ${CMD}" 2>&1 | tee hessian_simple/results/bergson.log

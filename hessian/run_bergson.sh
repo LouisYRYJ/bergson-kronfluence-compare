@@ -29,7 +29,7 @@ FSDP=""
 # Only track last layer (23) — exclude layers 0-22 and lm_head
 FILTER_MODULES=""
 
-ENV_PREFIX="CUDA_VISIBLE_DEVICES=0"
+ENV_PREFIX="CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}"
 
 # ── Build & run command ──────────────────────────────────────────────────────
 CMD="python -m common.bergson_hessian ${RUN_PATH}"
@@ -54,5 +54,6 @@ CMD+=" --overwrite"
 [[ -n "${FSDP}" ]]                  && CMD+=" ${FSDP}"
 [[ -n "${FILTER_MODULES}" ]]        && CMD+=" --filter_modules \"${FILTER_MODULES}\""
 
+mkdir -p hessian/results
 echo "Running: ${ENV_PREFIX} ${CMD}"
-eval "${ENV_PREFIX} ${CMD}"
+eval "${ENV_PREFIX} ${CMD}" 2>&1 | tee hessian/results/bergson.log

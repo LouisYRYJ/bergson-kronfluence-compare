@@ -14,6 +14,7 @@ Usage:
 import argparse
 import logging
 from datetime import timedelta
+from pathlib import Path
 
 import torch
 from accelerate import Accelerator, InitProcessGroupKwargs
@@ -59,6 +60,7 @@ def parse_args():
         help="Sum query gradients into one vector before scoring.",
     )
 
+    parser.add_argument("--output_dir", type=str, default="./raw_influence/results")
     parser.add_argument("--overwrite", action="store_true", default=False)
     parser.add_argument("--profile", action="store_true", default=False)
 
@@ -137,7 +139,13 @@ def main():
     model = accelerator.prepare_model(model)
 
     # Analyzer.
-    analyzer = Analyzer(analysis_name="bergson_compare", model=model, task=task, profile=args.profile)
+    analyzer = Analyzer(
+        analysis_name="kronfluence",
+        model=model,
+        task=task,
+        output_dir=args.output_dir,
+        profile=args.profile,
+    )
     dataloader_kwargs = DataLoaderKwargs(num_workers=4, collate_fn=default_data_collator, pin_memory=True)
     analyzer.set_dataloader_kwargs(dataloader_kwargs)
 
@@ -169,11 +177,10 @@ def main():
     )
 
     scores = analyzer.load_pairwise_scores(args.scores_name)["all_modules"]
-    # Kronfluence sums query gradients, bergson averages them. Divide by query
-    # dataset size so the scores match bergson's mean-aggregation convention.
-    if args.aggregate_query_gradients:
-        scores = scores / len(query_dataset)
-    logging.info("Scores shape: %s", scores.shape)
+
+    out_path = Path(args.output_dir) / "kronfluence_scores.pt"
+    torch.save(scores.squeeze(), out_path)
+    logging.info("Scores shape: %s, saved to %s", scores.shape, out_path)
 
 
 if __name__ == "__main__":

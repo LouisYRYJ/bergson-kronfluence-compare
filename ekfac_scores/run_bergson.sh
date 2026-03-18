@@ -28,7 +28,7 @@ FILTER_MODULES=""
 # ── EKFAC ────────────────────────────────────────────────────────────────────
 LAMBDA_DAMP_FACTOR=0.1
 
-ENV_PREFIX="CUDA_VISIBLE_DEVICES=0"
+ENV_PREFIX="CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}"
 
 # ── Build & run command ──────────────────────────────────────────────────────
 CMD="python -m ekfac_scores.bergson_pipeline ${RUN_PATH}"
@@ -53,5 +53,6 @@ CMD+=" --skip_preconditioners"
 [[ -n "${TRUNCATION}" ]]            && CMD+=" ${TRUNCATION}"
 [[ -n "${FSDP}" ]]                  && CMD+=" ${FSDP}"
 
+mkdir -p ekfac_scores/results
 echo "Running: ${ENV_PREFIX} ${CMD}"
-eval "${ENV_PREFIX} ${CMD}"
+eval "${ENV_PREFIX} ${CMD}" 2>&1 | tee ekfac_scores/results/bergson.log

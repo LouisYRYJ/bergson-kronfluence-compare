@@ -135,8 +135,16 @@ def main():
     score_cfg = ScoreConfig(query_path=ekfac_query_path)
     score_dataset(score_index_cfg, score_cfg, PreprocessConfig())
 
+    # Save flat scores for easy comparison
+    from bergson.data import load_scores
+
+    scores = load_scores(Path(score_index_cfg.run_path))
+    flat = torch.from_numpy(scores.mmap["score_0"].astype("float32"))
+    out_path = run_path.parent / "bergson_scores.pt"
+    torch.save(flat, out_path)
+
     print("=" * 60)
-    print(f"Done! Scores saved to: {score_index_cfg.run_path}")
+    print(f"Done! Scores saved to: {out_path}")
     print("=" * 60)
 
 

@@ -15,6 +15,7 @@ Usage:
 import argparse
 import logging
 from datetime import timedelta
+from pathlib import Path
 
 import torch
 from accelerate import Accelerator, InitProcessGroupKwargs
@@ -76,6 +77,7 @@ def parse_args():
         action=argparse.BooleanOptionalAction, default=True,
     )
 
+    parser.add_argument("--output_dir", type=str, default="./ekfac_scores/results")
     parser.add_argument("--overwrite", action="store_true", default=False)
     parser.add_argument("--profile", action="store_true", default=False)
 
@@ -149,11 +151,12 @@ def main():
     model = accelerator.prepare_model(model)
 
     # ── Analyzer ─────────────────────────────────────────────────────────────
-    analysis_name = args.analysis_name or args.factors_name
+    analysis_name = args.analysis_name or "kronfluence"
     analyzer = Analyzer(
         analysis_name=analysis_name,
         model=model,
         task=task,
+        output_dir=args.output_dir,
         profile=args.profile,
     )
 
@@ -189,7 +192,10 @@ def main():
     scores = analyzer.load_pairwise_scores(args.scores_name)["all_modules"]
     if args.aggregate_query_gradients:
         scores = scores / len(query_dataset)
-    logging.info("Scores shape: %s, range: [%.4f, %.4f]", scores.shape, scores.min(), scores.max())
+
+    out_path = Path(args.output_dir) / "kronfluence_scores.pt"
+    torch.save(scores.squeeze(), out_path)
+    logging.info("Scores shape: %s, saved to %s", scores.shape, out_path)
 
 
 if __name__ == "__main__":

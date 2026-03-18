@@ -22,7 +22,7 @@ LOSS_REDUCTION="sum"
 FSDP=""
 FILTER_MODULES=""
 
-ENV_PREFIX="CUDA_VISIBLE_DEVICES=0"
+ENV_PREFIX="CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}"
 
 # ── Build & run command ──────────────────────────────────────────────────────
 CMD="python -m raw_influence.bergson_pipeline ${RUN_PATH}"
@@ -45,5 +45,6 @@ CMD+=" --skip_preconditioners"
 [[ -n "${TRUNCATION}" ]]            && CMD+=" ${TRUNCATION}"
 [[ -n "${FSDP}" ]]                  && CMD+=" ${FSDP}"
 
+mkdir -p raw_influence/results
 echo "Running: ${ENV_PREFIX} ${CMD}"
-eval "${ENV_PREFIX} ${CMD}"
+eval "${ENV_PREFIX} ${CMD}" 2>&1 | tee raw_influence/results/bergson.log

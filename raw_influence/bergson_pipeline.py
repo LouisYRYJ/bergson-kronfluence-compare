@@ -77,7 +77,14 @@ def main():
     print(f"Scoring index dataset: {pipeline_cfg.index_dataset}")
     score_dataset(score_index_cfg, score_cfg, PreprocessConfig())
 
-    print(f"Scores path: {score_index_cfg.run_path}")
+    # Save flat scores for easy comparison
+    from bergson.data import load_scores
+
+    scores = load_scores(Path(score_index_cfg.run_path))
+    flat = torch.from_numpy(scores.mmap["score_0"].astype("float32"))
+    out_path = run_path.parent / "bergson_scores.pt"
+    torch.save(flat, out_path)
+    print(f"Scores saved to: {out_path}")
 
 
 if __name__ == "__main__":

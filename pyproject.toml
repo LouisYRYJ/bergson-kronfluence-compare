@@ -8,7 +8,9 @@ description = "Comparison of bergson and kronfluence influence function implemen
 requires-python = ">=3.10"
 license = {text = "MIT License"}
 dependencies = [
-    "bergson",
+    "bergson @ git+https://github.com/EleutherAI/bergson.git",
+    "ipykernel>=7.2.0",
+    "ipywidgets>=8.1.8",
     "kronfluence",
     "matplotlib",
     "numpy",
@@ -19,7 +21,7 @@ dependencies = [
 version = "0.1.0"
 
 [tool.setuptools.packages.find]
-include = ["common*"]
+include = ["common*", "raw_influence*", "ekfac_scores*", "hessian*", "hessian_simple*"]
 
 [tool.ruff]
 lint.ignore = ["E741","F722"]
