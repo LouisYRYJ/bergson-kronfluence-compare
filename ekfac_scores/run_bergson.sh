@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+DIR="$(cd "$(dirname "$0")" && pwd)"
+
 # ── User Configuration ───────────────────────────────────────────────────────
 MODEL="EleutherAI/pythia-14m-deduped"
 QUERY_DATASET="NeelNanda/pile-10k"
 INDEX_DATASET="NeelNanda/pile-10k"
-RUN_PATH="ekfac_scores/results/bergson"
+RUN_PATH="$DIR/results/bergson"
 
 # ── Data ─────────────────────────────────────────────────────────────────────
 PROMPT_COLUMN="text"
@@ -53,6 +55,6 @@ CMD+=" --skip_preconditioners"
 [[ -n "${TRUNCATION}" ]]            && CMD+=" ${TRUNCATION}"
 [[ -n "${FSDP}" ]]                  && CMD+=" ${FSDP}"
 
-mkdir -p ekfac_scores/results
+mkdir -p "$DIR/results"
 echo "Running: ${ENV_PREFIX} ${CMD}"
-eval "${ENV_PREFIX} ${CMD}" 2>&1 | tee ekfac_scores/results/bergson.log
+eval "${ENV_PREFIX} ${CMD}" 2>&1 | tee "$DIR/results/bergson.log"

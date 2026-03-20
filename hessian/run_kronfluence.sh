@@ -15,12 +15,13 @@ MAX_LENGTH=2048
 FACTOR_STRATEGY="ekfac"
 FACTORS_NAME="ekfac"
 ANALYSIS_NAME="kronfluence"
-OUTPUT_DIR="./hessian/results"
+DIR="$(cd "$(dirname "$0")" && pwd)"
+OUTPUT_DIR="$DIR/results"
 FACTOR_BATCH_SIZE=2
 TORCH_DTYPE="float32"
 
-# ── Module tracking ──────────────────────────────────────────────────────────
-TRACKED_MODULES=""
+# ── Module tracking (only layer 23 — matches bergson's FILTER_MODULES) ──────
+TRACKED_MODULES="model.layers.23.self_attn.q_proj,model.layers.23.self_attn.k_proj,model.layers.23.self_attn.v_proj,model.layers.23.self_attn.o_proj,model.layers.23.mlp.gate_proj,model.layers.23.mlp.up_proj,model.layers.23.mlp.down_proj"
 
 # ── Memory partitioning ─────────────────────────────────────────────────────
 COVARIANCE_MODULE_PARTITIONS=1
@@ -53,6 +54,6 @@ CMD+=" --overwrite"
 
 [[ -n "${TRACKED_MODULES}" ]] && CMD+=" --tracked_modules \"${TRACKED_MODULES}\""
 
-mkdir -p hessian/results
+mkdir -p "$DIR/results"
 echo "Running: ${ENV_PREFIX} ${CMD}"
-eval "${ENV_PREFIX} ${CMD}" 2>&1 | tee hessian/results/kronfluence.log
+eval "${ENV_PREFIX} ${CMD}" 2>&1 | tee "$DIR/results/kronfluence.log"

@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+DIR="$(cd "$(dirname "$0")" && pwd)"
+
 # ── User Configuration ───────────────────────────────────────────────────────
 MODEL="EleutherAI/pythia-14m-deduped"
 DATASET="NeelNanda/pile-10k"
-RUN_PATH="hessian_simple/results/bergson"
+RUN_PATH="$DIR/results/bergson"
 
 # ── Data ─────────────────────────────────────────────────────────────────────
 PROMPT_COLUMN="text"

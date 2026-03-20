@@ -10,7 +10,8 @@ MAX_LENGTH=2048
 FACTORS_NAME="ekfac"
 SCORES_NAME="ekfac_scores"
 ANALYSIS_NAME="kronfluence"
-OUTPUT_DIR="./ekfac_scores/results"
+DIR="$(cd "$(dirname "$0")" && pwd)"
+OUTPUT_DIR="$DIR/results"
 FACTOR_BATCH_SIZE=4
 QUERY_BATCH_SIZE=4
 TRAIN_BATCH_SIZE=8
@@ -31,8 +32,8 @@ CMD+=" --analysis_name ${ANALYSIS_NAME}"
 CMD+=" --truncation"
 CMD+=" --overwrite"
 
-mkdir -p ekfac_scores/results
-LOG="ekfac_scores/results/kronfluence.log"
+mkdir -p "$DIR/results"
+LOG="$DIR/results/kronfluence.log"
 
 echo "Running: ${CMD}"
 eval "${CMD}" 2>&1 | tee "${LOG}"

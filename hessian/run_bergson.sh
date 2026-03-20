@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+DIR="$(cd "$(dirname "$0")" && pwd)"
+
 # ── User Configuration ───────────────────────────────────────────────────────
 MODEL="Qwen/Qwen2.5-0.5B-Instruct"
 DATASET="/mnt/ssd-1/louis/emergent_misalignment/data/merged_medical/merged_medical.jsonl"
-RUN_PATH="hessian/results/bergson"
+RUN_PATH="$DIR/results/bergson"
 
 # ── Data ─────────────────────────────────────────────────────────────────────
 SPLIT="train"
@@ -27,7 +29,7 @@ LOSS_REDUCTION="sum"
 FSDP=""
 
 # Only track last layer (23) — exclude layers 0-22 and lm_head
-FILTER_MODULES=""
+FILTER_MODULES="*layers.[0-9].*,*layers.1[0-9].*,*layers.2[0-2].*,*.lm_head"
 
 ENV_PREFIX="CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}"
 
@@ -54,6 +56,6 @@ CMD+=" --overwrite"
 [[ -n "${FSDP}" ]]                  && CMD+=" ${FSDP}"
 [[ -n "${FILTER_MODULES}" ]]        && CMD+=" --filter_modules \"${FILTER_MODULES}\""
 
-mkdir -p hessian/results
+mkdir -p "$DIR/results"
 echo "Running: ${ENV_PREFIX} ${CMD}"
-eval "${ENV_PREFIX} ${CMD}" 2>&1 | tee hessian/results/bergson.log
+eval "${ENV_PREFIX} ${CMD}" 2>&1 | tee "$DIR/results/bergson.log"
